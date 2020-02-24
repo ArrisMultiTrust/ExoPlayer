@@ -25,6 +25,23 @@
     ]
   },
   {
+    "name": "MultiTrust",
+    "samples": [
+      {
+        "name": "BBC1",
+        "uri": "udp://@232.1.1.1:5004",
+        "extension": ""
+      },
+      {
+        "name": "TopGun",
+        "uri": "https://urm.latens.com:9443/demo/content/dash/top_gun_maverick/out.mpd",
+        "drm_scheme": "widevine",
+        "drm_license_url": "https://urm.latens.com:6443/WvLicenseProxy33",
+        "drm_key_request_properties": {"token": "eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4R0NNIiwia2lkIjoiMzAxOTNiNzctM2UyYS00MDlkLWEyMWEtMjQwZDIyOWE4YmI4IiwiaXNzIjoiQXJyaXMiLCJleHAiOiIxNzM3Mzg3OTU0MTE2IiwidmVyc2lvbiI6IjEifQo=.-u5Tvi0vXcl8mPuTjbG4yg==.U6fhcK24szebw70nhrP97A==.ZcB8x5xWMyotXfhVG9snoT3W3nZiWI-Jeblf87YocVGWgp_T5LNKPYKef5vMzzks42UMWJWJYWlyJdhPaqMfjAqW8yuPAeLt7DFab-iCpUQB3waSh3tPUcFTq5Xu0VmhfhYtbTEKMordFioaUdSFra4STDwgsKQC85GMO2q-AvyxpOk0u2XRpNXWjZ5UxFrenmAvBkmauiRYWITFvXW-nBomjDnyQIin9Ug=.hRl7ihc0SiliIPTBROfl4A=="}
+      }
+    ]
+  },
+  {
     "name": "Widevine DASH Policy Tests (GTS)",
     "samples": [
       {
@@ -376,52 +393,44 @@
         "uri": "https://html5demos.com/assets/dizzy.mp4"
       },
       {
-        "name": "Apple 10s (AAC)",
+        "name": "Apple AAC 10s",
         "uri": "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/gear0/fileSequence0.aac"
       },
       {
-        "name": "Apple 10s (TS)",
+        "name": "Apple TS 10s",
         "uri": "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/gear1/fileSequence0.ts"
       },
       {
-        "name": "Android screens (MKV)",
+        "name": "Android screens (Matroska)",
         "uri": "https://storage.googleapis.com/exoplayer-test-media-1/mkv/android-screens-lavf-56.36.100-aac-avc-main-1280x720.mkv"
       },
       {
-        "name": "Screens 360p video (WebM,VP9)",
+        "name": "Screens 360P (WebM,VP9,No Audio)",
         "uri": "https://storage.googleapis.com/exoplayer-test-media-1/gen-3/screens/dash-vod-single-segment/video-vp9-360.webm"
       },
       {
-        "name": "Screens 480p video (FMP4,H264)",
+        "name": "Screens 480p (FMP4,H264,No Audio)",
         "uri": "https://storage.googleapis.com/exoplayer-test-media-1/gen-3/screens/dash-vod-single-segment/video-avc-baseline-480.mp4"
       },
       {
-        "name": "Screens 1080p video (FMP4,H264)",
+        "name": "Screens 1080p (FMP4,H264, No Audio)",
         "uri": "https://storage.googleapis.com/exoplayer-test-media-1/gen-3/screens/dash-vod-single-segment/video-137.mp4"
       },
       {
-        "name": "Screens audio (FMP4)",
+        "name": "Screens (FMP4,AAC Audio)",
         "uri": "https://storage.googleapis.com/exoplayer-test-media-1/gen-3/screens/dash-vod-single-segment/audio-141.mp4"
       },
       {
-        "name": "Google Play (MP3)",
+        "name": "Google Play (MP3 Audio)",
         "uri": "https://storage.googleapis.com/exoplayer-test-media-0/play.mp3"
       },
       {
-        "name": "Google Play (Ogg/Vorbis)",
+        "name": "Google Play (Ogg/Vorbis Audio)",
         "uri": "https://storage.googleapis.com/exoplayer-test-media-1/ogg/play.ogg"
       },
       {
-        "name": "Google Play (FLAC)",
-        "uri": "https://storage.googleapis.com/exoplayer-test-media-1/flac/play.flac"
-      },
-      {
-        "name": "Big Buck Bunny video (FLV)",
+        "name": "Big Buck Bunny (FLV Video)",
         "uri": "https://vod.leasewebcdn.com/bbb.flv?ri=1024&rs=150&start=0"
-      },
-      {
-        "name": "Big Buck Bunny 480p video (MP4,AV1)",
-        "uri": "https://storage.googleapis.com/downloads.webmproject.org/av1/exoplayer/bbb-av1-480p.mp4"
       }
     ]
   },
@@ -455,27 +464,23 @@
       },
       {
         "name": "Clear -> Enc -> Clear -> Enc -> Enc",
+        "drm_scheme": "widevine",
+        "drm_license_url": "https://proxy.uat.widevine.com/proxy?provider=widevine_test",
         "playlist": [
           {
             "uri": "https://html5demos.com/assets/dizzy.mp4"
           },
           {
-            "uri": "https://storage.googleapis.com/wvmedia/cenc/h264/tears/tears_sd.mpd",
-            "drm_scheme": "widevine",
-            "drm_license_url": "https://proxy.uat.widevine.com/proxy?provider=widevine_test"
+            "uri": "https://storage.googleapis.com/wvmedia/cenc/h264/tears/tears_sd.mpd"
           },
           {
             "uri": "https://html5demos.com/assets/dizzy.mp4"
           },
           {
-            "uri": "https://storage.googleapis.com/wvmedia/cenc/h264/tears/tears_sd.mpd",
-            "drm_scheme": "widevine",
-            "drm_license_url": "https://proxy.uat.widevine.com/proxy?provider=widevine_test"
+            "uri": "https://storage.googleapis.com/wvmedia/cenc/h264/tears/tears_sd.mpd"
           },
           {
-            "uri": "https://storage.googleapis.com/wvmedia/cenc/h264/tears/tears_sd.mpd",
-            "drm_scheme": "widevine",
-            "drm_license_url": "https://proxy.uat.widevine.com/proxy?provider=widevine_test"
+            "uri": "https://storage.googleapis.com/wvmedia/cenc/h264/tears/tears_sd.mpd"
           }
         ]
       }
@@ -588,25 +593,6 @@
         "name": "Iceland (360 top-bottom stereo ts)",
         "uri": "https://storage.googleapis.com/exoplayer-test-media-1/360/iceland0.ts",
         "spherical_stereo_mode": "top_bottom"
-      }
-    ]
-  },
-  {
-    "name": "Subtitles",
-    "samples": [
-      {
-        "name": "TTML",
-        "uri": "https://html5demos.com/assets/dizzy.mp4",
-        "subtitle_uri": "https://storage.googleapis.com/exoplayer-test-media-1/ttml/netflix_ttml_sample.xml",
-        "subtitle_mime_type": "application/ttml+xml",
-        "subtitle_language": "en"
-      },
-      {
-        "name": "SSA/ASS position & alignment",
-        "uri": "https://storage.googleapis.com/exoplayer-test-media-1/gen-3/screens/dash-vod-single-segment/video-avc-baseline-480.mp4",
-        "subtitle_uri": "https://storage.googleapis.com/exoplayer-test-media-1/ssa/test-subs-position.ass",
-        "subtitle_mime_type": "text/x-ssa",
-        "subtitle_language": "en"
       }
     ]
   }

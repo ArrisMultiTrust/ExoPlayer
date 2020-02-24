@@ -33,6 +33,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.C.ContentType;
+import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.PlaybackPreparer;
@@ -41,6 +42,7 @@ import com.google.android.exoplayer2.RenderersFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.demo.Sample.UriSample;
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
+import com.google.android.exoplayer2.drm.DrmSession;
 import com.google.android.exoplayer2.drm.DrmSessionManager;
 import com.google.android.exoplayer2.drm.ExoMediaCrypto;
 import com.google.android.exoplayer2.drm.FrameworkMediaDrm;
@@ -375,10 +377,15 @@ public class PlayerActivity extends AppCompatActivity
       trackSelector.setParameters(trackSelectorParameters);
       lastSeenTrackGroupArray = null;
 
+      DefaultLoadControl.Builder builder = new DefaultLoadControl.Builder();
+      builder.setBufferDurationsMs(5000,65000, 1000, 1000);
+
       player =
           new SimpleExoPlayer.Builder(/* context= */ this, renderersFactory)
               .setTrackSelector(trackSelector)
+              .setLoadControl(builder.createDefaultLoadControl())
               .build();
+
       player.addListener(new PlayerEventListener());
       player.setPlayWhenReady(startAutoPlay);
       player.addAnalyticsListener(new EventLogger(trackSelector));
@@ -486,13 +493,20 @@ public class PlayerActivity extends AppCompatActivity
     } else if (!MediaDrm.isCryptoSchemeSupported(drmInfo.drmScheme)) {
       errorStringId = R.string.error_drm_unsupported_scheme;
     } else {
-      MediaDrmCallback mediaDrmCallback =
-          createMediaDrmCallback(drmInfo.drmLicenseUrl, drmInfo.drmKeyRequestProperties);
-      drmSessionManager =
-          new DefaultDrmSessionManager.Builder()
-              .setUuidAndExoMediaDrmProvider(drmInfo.drmScheme, FrameworkMediaDrm.DEFAULT_PROVIDER)
-              .setMultiSession(drmInfo.drmMultiSession)
-              .build(mediaDrmCallback);
+      if (drmInfo.drmKeyRequestProperties != null)
+      {
+        drmSessionManager = buildMultiTrustDrmSessionManager(drmInfo);
+      }
+      else {
+        MediaDrmCallback mediaDrmCallback =
+            createMediaDrmCallback(drmInfo.drmLicenseUrl, drmInfo.drmKeyRequestProperties);
+        drmSessionManager =
+            new DefaultDrmSessionManager.Builder()
+                .setUuidAndExoMediaDrmProvider(drmInfo.drmScheme,
+                    FrameworkMediaDrm.DEFAULT_PROVIDER)
+                .setMultiSession(drmInfo.drmMultiSession)
+                .build(mediaDrmCallback);
+      }
     }
 
     if (drmSessionManager == null) {
@@ -509,6 +523,22 @@ public class PlayerActivity extends AppCompatActivity
       return DownloadHelper.createMediaSource(downloadRequest, dataSourceFactory);
     }
     return createLeafMediaSource(parameters.uri, parameters.extension, drmSessionManager);
+  }
+
+  private DefaultDrmSessionManager<ExoMediaCrypto> buildMultiTrustDrmSessionManager (Sample.DrmInfo drmInfo)  {
+
+    if (Util.SDK_INT >= 18) {
+      MultiTrustDrmCallback drmCallback = new MultiTrustDrmCallback(
+          new MultiTrustHttpDataSource(drmInfo.drmLicenseUrl, drmInfo.drmKeyRequestProperties[1]));
+
+      return new DefaultDrmSessionManager.Builder()
+          .setUuidAndExoMediaDrmProvider(drmInfo.drmScheme, FrameworkMediaDrm.DEFAULT_PROVIDER)
+          .setMultiSession(false)
+          .build(drmCallback);
+    }
+
+    return null;
+
   }
 
   private MediaSource createLeafMediaSource(
@@ -528,7 +558,7 @@ public class PlayerActivity extends AppCompatActivity
             .setDrmSessionManager(drmSessionManager)
             .createMediaSource(uri);
       case C.TYPE_OTHER:
-        return new ProgressiveMediaSource.Factory(dataSourceFactory)
+        return new ProgressiveMediaSource.Factory(buildUDPDataSourceFactory())
             .setDrmSessionManager(drmSessionManager)
             .createMediaSource(uri);
       default:
@@ -599,6 +629,11 @@ public class PlayerActivity extends AppCompatActivity
   /** Returns a new DataSource factory. */
   private DataSource.Factory buildDataSourceFactory() {
     return ((DemoApplication) getApplication()).buildDataSourceFactory();
+  }
+
+  /** Returns a new UDP DataSource factory. */
+  private DataSource.Factory buildUDPDataSourceFactory() {
+    return ((DemoApplication) getApplication()).buildUDPDataSourceFactory();
   }
 
   /** Returns an ads media source, reusing the ads loader if one exists. */
@@ -753,6 +788,18 @@ public class PlayerActivity extends AppCompatActivity
                     R.string.error_instantiating_decoder,
                     decoderInitializationException.codecInfo.name);
           }
+        }
+      }
+      //DRMSession exceptions are of TYPE_SOURCE
+      else if (e.type == ExoPlaybackException.TYPE_SOURCE) {
+        Exception cause = e.getSourceException();
+        if (cause instanceof DrmSession.DrmSessionException) {
+          Throwable underlyingCause = cause.getCause();
+          if (underlyingCause instanceof MultiTrustDrmException)
+          {
+            errorString = ((MultiTrustDrmException)underlyingCause).error;
+          }
+
         }
       }
       return Pair.create(0, errorString);
